@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<head>
+<!-- <script scr='/poligon.js'></script> -->
+
+<!-- <script src="https://leafletjs-cdn.s3.amazonaws.com/content/leaflet/master/leaflet.js"></script> -->
+<!-- <link rel="stylesheet" href="MarkerCluster.css" /> -->
+<!-- <link rel="stylesheet" href="MarkerCluster.Default.css" /> -->
+<!-- <script type="text/javascript" src="{{ url_for('static', filename='leaflet.markercluster-src.js') }}"></script> -->
+<!-- <script type="text/javascript" src="{{ url_for('static', filename='leaflet.markercluster.js') }}"></script> -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script> -->
+
+<!--     <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
+    <script type='text/javascript' src='http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js?2'></script>
+    <script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.4.0/leaflet.markercluster.js'></script> -->
+
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css">
+<script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+<style>
+ 
+#map {width: 1200px; height: 800px; }
+ 
+</style>
+
+</head>
+
+<body>
+<p id="demo"></p>
+<div id="map"></div>
+
+<!-- <script  type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script> -->
+
+<script type="text/javascript">
+  var poligons ={{poligons|safe}};
+  var map = L.map('map').setView([48.447, 31.182], 6);
+  var OpenMapSurfer_Roads = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
+    attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+
+L.geoJson(JSON.parse({{poligons|safe}}), {
+   // pointToLayer: function (feature, latlng) {
+   //              return L.marker(latlng, {icon: baseballIcon});
+   //          },
+    onEachFeature: function (poligons, layer) {
+      // console.log(layer.feature.properties.name);
+      // document.getElementById("demo").innerHTML = layer;
+      layer.on({
+        click: function (e) {
+          var layer1 = e.target;
+          map.fitBounds(layer1.getBounds());
+          layer.onRemove(map);
+
+          L.geoJson(JSON.parse({{poligonsReg|safe}}), {
+            // pointToLayer: function (poligonsReg, latlng) {
+            //   return L.marker(latlng, {icon: baseballIcon});
+            // },
+            onEachFeature: function (poligonsReg, layer) {
+              console.log(layer.feature.properties.name);
+              layer.onAdd(map)
+              // document.getElementById("demo").innerHTML = layer;
+              layer.on({
+                click: function (e) {
+                  var layer1 = e.target;
+                  map.fitBounds(layer1.getBounds());
+                  layer.onRemove(map);
+                  var point= {{dictOdject|safe}};
+                  console.log(point);
+                  for (i = 0; i < point.length; i++){
+
+                    L.marker(point[i]).addTo(map).bindPopup('<p>DESCR</p>').openPopup();
+                    
+
+                  }
+              }
+    });
+  }
+});
+
+
+
+        }
+    });
+  }
+}).addTo(map);
+
+
+
+
+
+
+map.on({
+      click: function() {
+        map.setView([48.447, 31.182], 6);
+      }
+  });
+</script>
+
+
+
+</body>
